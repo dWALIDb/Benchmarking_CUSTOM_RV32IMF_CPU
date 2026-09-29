@@ -8,7 +8,7 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   Serial.begin(115200);
 delay(10000);
-  Serial.print("input,output,cycles taken \n");
+  Serial.print("input,output,cycles taken\n");
 
 }
 
