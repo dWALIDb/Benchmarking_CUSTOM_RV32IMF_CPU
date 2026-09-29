@@ -108,7 +108,7 @@ void print_small_float(float f, int precision) {
 float l0[16], l1[16];  // outputs buffers for each layer
 
 int main() {
-	printf("input,output,cycles taken \n");
+	printf("input,output,cycles taken\n");
 	float input=-PI;
     for(int i=0 ;i<628 ;i++){
     // 1. Wipe the counter history and turn it on
