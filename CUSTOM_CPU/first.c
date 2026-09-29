@@ -67,41 +67,45 @@ int main() {
     uart_enable(TX_ENABLE|RX_ENABLE);
     enable_interrupts(interrupt_handler);
     uart_write("main\n\r",7);
-
-    float a,b,c;
-
-    for (int i = 0; i < 10; i++)
-    {
-        a=(float)i;
-        b=(float)-i;
-        uart_write("*************************************************",50);
-        print_int(i);
-        uart_write("\n\r",2);
-        print_float(a);
-        uart_write("\n\r",2);
-        print_float(b);
-        uart_write("\n\r",2);
-        c=a+a;
-        print_float(c);
-        uart_write("\n\r",2);
-        c=a-a;
-        print_float(c);
-        uart_write("\n\r",2);
-        c=b+b;
-        print_float(c);
-        uart_write("\n\r",2);
-        c=b-b;
-        print_float(c);
-        uart_write("\n\r",2);
-        c=a+b;
-        print_float(c);
-        uart_write("\n\r",2);
-        c=a-b;
-        print_float(c);
-        uart_write("\n\r",2);
-        uart_write("*************************************************",50);
-   }
+    #define PI 3.14159265359f
+    input=-PI;
     
+        // we send taylor series vales first,then send ann last.
+        uart_write("input,output,cycles taken\n\r",28);
+    for (int i = 0; i < 628; i++)
+    {
+
+        uint32_t start= read_cycle_counter(CYCLE_COUNTER_LOW);
+        float inp=standardize_input(input,INPUT_MEAN,INPUT_SCALE);
+        forward_pass(&inp, 1, W0 ,B0, l0, 4);
+        tanh_activation(l0, 8);
+        
+        // uart_write("layer2\n\r",9);
+        forward_pass(l0, 4, W1, B1, l1, 8);
+        tanh_activation(l1, 16);
+        
+        // uart_write("layer3\n\r",9);
+        forward_pass(l1, 8, W2, B2, l0, 8);
+        tanh_activation(l0, 16);
+        
+        // uart_write("layer4\n\r",9);
+        forward_pass(l0, 8, W3, B3, l1, 4);
+        tanh_activation(l1, 8);
+        
+        // Layer 4 (final output)
+        forward_pass(l1, 4, W4, B4, l0, 1);
+        uint32_t end= read_cycle_counter(CYCLE_COUNTER_LOW);
+        uint32_t cycles= end-start;
+        
+        // we send taylor series vales first,then send ann last.
+        print_float(input);//ANN is the last value MUST KEEP IN MIND
+        uart_write(" , ",3);
+        print_float(l0[0]);//ANN is the last value MUST KEEP IN MIND
+        uart_write(" , ",3);
+        print_int(cycles);//ANN is the last value MUST KEEP IN MIND
+        uart_write("\n\r",3);
+        input+=0.01f;
+    }
     while(1){}
     return 0;
 }
